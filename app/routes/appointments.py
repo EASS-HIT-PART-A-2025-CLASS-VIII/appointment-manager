@@ -2,18 +2,10 @@ from fastapi import APIRouter, HTTPException
 from typing import List
 
 from app.models import Appointment, AppointmentCreate
-from app.repository import (
-    get_all,
-    get_by_id,
-    create,
-    update,
-    delete
-)
+from app.repository import get_all, get_by_id, create, update, delete
 
-router = APIRouter(
-    prefix="/appointments",
-    tags=["appointments"]
-)
+router = APIRouter(prefix="/appointments", tags=["appointments"])
+
 
 @router.get("/", response_model=List[Appointment])
 def list_appointments():

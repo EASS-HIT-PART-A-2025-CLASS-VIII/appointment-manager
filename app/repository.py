@@ -24,14 +24,16 @@ def create(appointment_data: AppointmentCreate) -> Appointment:
         client_name=appointment_data.client_name,
         date=appointment_data.date,
         time=appointment_data.time,
-        notes=appointment_data.notes
+        notes=appointment_data.notes,
     )
     appointments.append(new_appointment)
     _next_id += 1
     return new_appointment
 
 
-def update(appointment_id: int, appointment_data: AppointmentCreate) -> Optional[Appointment]:
+def update(
+    appointment_id: int, appointment_data: AppointmentCreate
+) -> Optional[Appointment]:
     appointment = get_by_id(appointment_id)
     if appointment is None:
         return None

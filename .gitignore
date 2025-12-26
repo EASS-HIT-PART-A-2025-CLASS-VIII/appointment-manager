@@ -27,3 +27,7 @@ docker-compose.override.yml
 # Local environment overrides
 .env
 .env.*
+
+# SQLite database files
+data/*.db
+data/*.sqlite

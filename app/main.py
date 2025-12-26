@@ -1,11 +1,23 @@
+"""
+Main FastAPI application entrypoint.
+Includes routers and defines the root endpoint.
+"""
+
 from fastapi import FastAPI
-from app.routes.appointments import router as appointments_router
+from app.database import init_db
+from app.routes.appointments import router
 
-app = FastAPI()
+app = FastAPI(title="Appointment Manager")
 
-app.include_router(appointments_router)
+# Attach routers
+app.include_router(router)
 
 
+# Root endpoint
 @app.get("/")
 def root():
     return {"status": "ok", "message": "Appointments API is running"}
+
+
+# Initialize DB tables
+init_db()

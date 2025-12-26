@@ -31,3 +31,4 @@ docker-compose.override.yml
 # SQLite database files
 data/*.db
 data/*.sqlite
+appointments_test.db

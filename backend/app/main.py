@@ -4,8 +4,9 @@ Includes routers and defines the root endpoint.
 """
 
 from fastapi import FastAPI
-from app.database import init_db
-from app.routes.appointments import router
+from backend.app.database import init_db
+from backend.app.routes.appointments import router
+
 
 app = FastAPI(title="Appointment Manager")
 

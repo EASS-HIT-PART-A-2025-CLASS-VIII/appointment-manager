@@ -2,8 +2,8 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import SQLModel, create_engine, Session
-from app.main import app
-from app.database import get_session
+from backend.app.main import app
+from backend.app.database import get_session
 
 
 TEST_DB = "appointments_test.db"
@@ -18,8 +18,7 @@ def session():
             pass
 
     engine = create_engine(
-        f"sqlite:///{TEST_DB}",
-        connect_args={"check_same_thread": False}
+        f"sqlite:///{TEST_DB}", connect_args={"check_same_thread": False}
     )
     SQLModel.metadata.create_all(engine)
 

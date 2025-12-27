@@ -1,9 +1,15 @@
-# Appointment Manager – FastAPI Backend (EX1)
+# Appointment Manager – Full System (Backend + Frontend + Docker Compose)
 
-A lightweight **FastAPI** microservice that manages appointments.  
-This is the backend foundation for the full project (EX1 → EX2 → EX3), following the requirements from Sessions 02–04.
+A complete appointment-management system built across two project stages:
 
-The service exposes full CRUD operations, uses **Pydantic** models, an **in-memory repository**, and includes a **Dockerized runtime** as required for EX1 preparation toward the full multi-service system.
+- **EX1:** FastAPI backend (CRUD API + tests + Docker)
+- **EX2:** Streamlit dashboard frontend + Docker + Docker Compose
+
+The system includes:
+
+- A **FastAPI backend** using **SQLite + SQLModel**
+- A **Streamlit frontend** communicating with the API
+- A **Docker Compose** setup that runs both services together
 
 ---
 
@@ -12,92 +18,134 @@ The service exposes full CRUD operations, uses **Pydantic** models, an **in-memo
 ```
 appointments-api/
 │
-├── app/
-│   ├── main.py              # FastAPI entrypoint
-│   ├── models.py            # Pydantic data models
-│   ├── repository.py        # In-memory persistence layer
-│   ├── routes/
-│   │   └── appointments.py  # CRUD endpoints router
-│   └── __init__.py
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── models.py
+│   │   ├── database.py
+│   │   ├── repository.py
+│   │   ├── repository_sqlite.py
+│   │   ├── __init__.py
+│   │   └── routes/
+│   │       └── appointments.py
+│   │
+│   ├── tests/
+│   │   ├── conftest.py
+│   │   └── test_appointments.py
+│   │
+│   └── Dockerfile
 │
-├── tests/
-│   └── test_appointments.py # Pytest suite (happy-path coverage)
+├── frontend/
+│   ├── client.py
+│   ├── dashboard.py
+│   └── Dockerfile
 │
+├── data/
+│   └── appointments.db     # SQLite DB (ignored in Git)
+│
+├── docker-compose.yml
 ├── requirements.txt
-├── Dockerfile
 ├── pytest.ini
 └── README.md
 ```
 
 ---
 
-## Run the API with Docker (Recommended & Required for EX1)
+## API Endpoints Overview
 
-### 1️⃣ Build the image
-```powershell
-docker build -t appointments-api .
+| Method | Path                     | Description                                 |
+|--------|---------------------------|---------------------------------------------|
+| **GET**    | `/`                       | Root endpoint – service health message       |
+| **POST**   | `/appointments/`          | Create a new appointment                     |
+| **GET**    | `/appointments/`          | List all appointments                        |
+| **GET**    | `/appointments/{id}`      | Retrieve appointment by ID                   |
+| **PUT**    | `/appointments/{id}`      | Update an existing appointment               |
+| **DELETE** | `/appointments/{id}`      | Delete an appointment                        |
+
+---
+
+# Running the System with Docker Compose (Recommended)
+
+### 1️⃣ Build all services
+```bash
+docker compose build
 ```
 
-### 2️⃣ Run the container
-```powershell
-docker run --rm -p 8000:8000 appointments-api
+### 2️⃣ Run backend + frontend
+```bash
+docker compose up
 ```
 
-### 3️⃣ Open the interactive API docs
+### 3️⃣ Access the system
+
+| Component | URL |
+|----------|-----|
+| **Frontend (Streamlit UI)** | http://localhost:8501 |
+| **Backend API Docs** | http://localhost:8000/docs |
+
+---
+
+# Running Backend Alone (EX1)
+
+### Build backend image
+```bash
+docker build -t appointments-api-backend ./backend
+```
+
+### Run backend
+```bash
+docker run -p 8000:8000 appointments-api-backend
+```
+
+### API docs
 ```
 http://localhost:8000/docs
 ```
 
 ---
 
-## Running Tests (Locally or Inside CI)
+# Running Tests
 
-```
+```bash
 pytest -q
 ```
 
-The test suite covers:
+Tests cover:
 
-- Creating a new appointment  
-- Listing all appointments  
-- Retrieving a specific appointment  
-- Updating appointment details  
-- Deleting an appointment and verifying deletion  
+- Create
+- Read all
+- Read single
+- Update
+- Delete + verify deletion
 
-Expected output:
+Example expected output:
+
 ```
 5 passed in X.XXs
 ```
 
 ---
 
-## API Endpoints Overview
+# Running Frontend Alone (EX2)
 
-| Method | Path                  | Description                       |
-|--------|-----------------------|-----------------------------------|
-| POST   | `/appointments/`      | Create a new appointment          |
-| GET    | `/appointments/`      | List all appointments             |
-| GET    | `/appointments/{id}`  | Retrieve appointment by ID        |
-| PUT    | `/appointments/{id}`  | Update an existing appointment    |
-| DELETE | `/appointments/{id}`  | Delete an appointment             |
+### Build frontend image
+```bash
+docker build -t appointments-api-frontend ./frontend
+```
 
-### Example payload (POST)
-```json
-{
-  "client_name": "John Doe",
-  "date": "2025-01-01",
-  "time": "12:00",
-  "notes": "Consultation"
-}
+### Run frontend (pointing to backend)
+```bash
+docker run -p 8501:8501 -e API_BASE_URL="http://127.0.0.1:8000" appointments-api-frontend
 ```
 
 ---
 
-## Notes
+# 📝 Notes
 
-- Persistence is **in-memory** only (per EX1 specification).  
-- IDs are auto-incrementing integers starting from 1.  
-- A real SQLite/SQLModel persistence layer will be added in EX2/EX3.  
-- This backend is the foundation for the interface layer and future multi-service architecture.
+- Backend uses **SQLite + SQLModel** (persistent storage)
+- Frontend communicates via **httpx**
+- Docker Compose links backend + frontend on an internal network (`backend:8000`)
+- SQLite DB file (`data/appointments.db`) is **excluded from Git**
+- Root endpoint (`GET /`) added for basic service health verification
 
 

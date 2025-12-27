@@ -1,7 +1,7 @@
 from typing import Optional, List
 from sqlmodel import Session, select
 
-from app.models import (
+from backend.app.models import (
     Appointment,
     AppointmentCreate,
     AppointmentUpdate,

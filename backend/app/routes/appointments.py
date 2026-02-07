@@ -1,8 +1,3 @@
-"""
-FastAPI routes exposing CRUD endpoints for appointments.
-Backed by the SQLite repository.
-"""
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app.models import AppointmentCreate, AppointmentRead, AppointmentUpdate
 from backend.app.database import get_session

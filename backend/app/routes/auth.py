@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
+from backend.app.core.deps import require_role
 from backend.app.core.security import (
     create_access_token,
     get_password_hash,
@@ -43,3 +44,8 @@ def login(
 
     access_token = create_access_token(subject=user.username)
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/admin/ping")
+def admin_ping(current_user: User = Depends(require_role("admin"))):
+    return {"status": "ok", "user": current_user.username}

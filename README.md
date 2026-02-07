@@ -38,12 +38,17 @@ appointments-api/
 │   │       ├── auth.py
 │   │       └── summary.py
 │   │
+│   │   ├── scripts/
+│   │   │   ├── refresh.py
+│   │   │   └── demo.sh
+│   │
 │   ├── tests/
 │   │   ├── conftest.py
 │   │   ├── test_appointments.py
 │   │   └── test_auth.py
 │   │   ├── test_summary.py
 │   │   └── test_summary_worker.py
+│   │   └── test_refresh.py
 │   │
 │   └── Dockerfile
 │
@@ -56,6 +61,11 @@ appointments-api/
 │   └── appointments.db     # SQLite DB (ignored in Git)
 │
 ├── docker-compose.yml
+├── compose.yaml
+├── docs/
+│   ├── EX3-notes.md
+│   └── runbooks/
+│       └── compose.md
 ├── requirements.txt
 ├── pytest.ini
 └── README.md
@@ -139,6 +149,8 @@ http://localhost:8000/docs
 pytest -q
 ```
 
+Note: `test_refresh.py` uses Redis and will skip if Redis is not running.
+
 Tests cover:
 
 - Create
@@ -153,12 +165,13 @@ Tests cover:
 - Protected endpoints require JWT
 - Summary queue/result behavior (Redis mocked)
 - Summary worker prompt formatting and processing (Agent mocked)
+- Async refresh idempotency (Redis-backed)
 - CSV export output
 
 Example expected output:
 
 ```
-21 passed in X.XXs
+23 passed, 1 skipped in X.XXs
 ```
 
 ---
@@ -174,6 +187,15 @@ docker build -t appointments-api-frontend ./frontend
 ```bash
 docker run -p 8501:8501 -e API_BASE_URL="http://127.0.0.1:8000" appointments-api-frontend
 ```
+
+---
+
+# EX3 Docs and Scripts
+
+- Architecture and security notes: docs/EX3-notes.md
+- Compose runbook: docs/runbooks/compose.md
+- Async refresher: backend/scripts/refresh.py
+- Demo walkthrough: backend/scripts/demo.sh
 
 ---
 

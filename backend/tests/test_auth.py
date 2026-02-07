@@ -1,3 +1,7 @@
+from backend.app.core.security import get_password_hash
+from backend.app.models import User
+
+
 def test_register_returns_token(client):
     response = client.post(
         "/auth/register",
@@ -86,3 +90,35 @@ def test_protected_endpoints_reject_expired_token(client):
     headers = {"Authorization": f"Bearer {token}"}
     response = client.get("/appointments/", headers=headers)
     assert response.status_code == 401
+
+
+def test_admin_route_requires_admin_role(client, session):
+    user = User(
+        username="admin",
+        hashed_password=get_password_hash("secret"),
+        role="admin",
+    )
+    session.add(user)
+    session.commit()
+
+    response = client.post(
+        "/auth/token",
+        data={"username": "admin", "password": "secret"},
+    )
+    token = response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get("/auth/admin/ping", headers=headers)
+    assert response.status_code == 200
+
+
+def test_admin_route_rejects_non_admin(client):
+    response = client.post(
+        "/auth/register",
+        json={"username": "user", "password": "secret"},
+    )
+    token = response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get("/auth/admin/ping", headers=headers)
+    assert response.status_code == 403

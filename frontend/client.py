@@ -60,6 +60,15 @@ def delete_appointment(token: str, appointment_id: int):
     response.raise_for_status()
 
 
+def export_appointments_csv(token: str) -> str:
+    response = httpx.get(
+        f"{API_BASE_URL}/appointments/export",
+        headers=_auth_headers(token),
+    )
+    response.raise_for_status()
+    return response.text
+
+
 def request_summary(token: str) -> dict:
     response = httpx.post(
         f"{API_BASE_URL}/summary/", headers=_auth_headers(token)

@@ -6,6 +6,7 @@ from client import (
     list_appointments,
     create_appointment,
     delete_appointment,
+    export_appointments_csv,
     count_appointments_today,
     register_user,
     login_user,
@@ -97,6 +98,17 @@ if total_count == 0:
 else:
     df = pd.DataFrame(appointments)
     st.dataframe(df, use_container_width=True)
+
+    try:
+        csv_data = export_appointments_csv(auth_token)
+        st.download_button(
+            label="Download CSV",
+            data=csv_data,
+            file_name="appointments.csv",
+            mime="text/csv",
+        )
+    except Exception as exc:
+        st.error(f"CSV export failed: {exc}")
 
 
 # Refresh button

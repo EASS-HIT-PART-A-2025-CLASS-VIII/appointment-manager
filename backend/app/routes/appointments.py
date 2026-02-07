@@ -3,7 +3,10 @@ FastAPI routes exposing CRUD endpoints for appointments.
 Backed by the SQLite repository.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import csv
+from io import StringIO
+
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from backend.app.models import AppointmentCreate, AppointmentRead, AppointmentUpdate
 from backend.app.core.deps import get_current_user
 from backend.app.database import get_session
@@ -21,6 +24,33 @@ def get_repo(session=Depends(get_session)):
 @router.get("/", response_model=list[AppointmentRead])
 def list_appointments(repo=Depends(get_repo)):
     return repo.list()
+
+
+@router.get("/export")
+def export_appointments(repo=Depends(get_repo)):
+    appointments = repo.list()
+
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["id", "client_name", "date", "time", "notes"])
+    for appointment in appointments:
+        writer.writerow(
+            [
+                appointment.id,
+                appointment.client_name,
+                appointment.date,
+                appointment.time,
+                appointment.notes or "",
+            ]
+        )
+
+    return Response(
+        content=output.getvalue(),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=appointments.csv"
+        },
+    )
 
 
 @router.get("/{appointment_id}", response_model=AppointmentRead)

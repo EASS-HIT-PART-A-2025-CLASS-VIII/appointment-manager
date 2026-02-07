@@ -61,7 +61,6 @@ appointments-api/
 │   └── appointments.db     # SQLite DB (ignored in Git)
 │
 ├── docker-compose.yml
-├── compose.yaml
 ├── docs/
 │   ├── EX3-notes.md
 │   └── runbooks/
@@ -193,7 +192,7 @@ docker run -p 8501:8501 -e API_BASE_URL="http://127.0.0.1:8000" appointments-api
 # EX3 Docs and Scripts
 
 - Architecture and security notes: docs/EX3-notes.md
-- Compose runbook: docs/runbooks/compose.md
+- Compose runbook: docs/runbooks/compose.md (uses docker-compose.yml)
 - Async refresher: backend/scripts/refresh.py
 - Demo walkthrough: backend/scripts/demo.sh
 

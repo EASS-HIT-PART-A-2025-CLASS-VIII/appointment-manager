@@ -42,10 +42,10 @@ async def worker_loop():
     while True:
         try:
             job = await client.blpop(QUEUE, timeout=5)
-            
+
             if job is None:
                 continue
-                
+
             _, raw = job
             count = await process_job(client, raw)
             print(f"Summary generated for {count} appointments")

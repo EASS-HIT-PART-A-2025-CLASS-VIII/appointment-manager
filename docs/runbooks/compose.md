@@ -8,7 +8,7 @@ This document explains how to run the stack locally and verify the services.
 Build and start all services (backend, frontend, worker, Redis):
 
 ```bash
-docker compose up -d --build
+docker compose -f docker-compose.yml up -d --build
 ```
 
 Services:
@@ -22,7 +22,7 @@ Services:
 Check container status:
 
 ```bash
-docker compose ps
+docker compose -f docker-compose.yml ps
 ```
 
 Verify the backend is responding:
@@ -37,7 +37,7 @@ curl -I http://localhost:8000/
 Follow worker logs to confirm summary processing:
 
 ```bash
-docker compose logs -f worker
+docker compose -f docker-compose.yml logs -f worker
 ```
 
 ---
@@ -55,11 +55,11 @@ curl -I http://localhost:8000/appointments/
 Run tests inside the backend container:
 
 ```bash
-docker compose exec backend pytest -q
+docker compose -f docker-compose.yml exec backend pytest -q
 ```
 
 OpenAPI contract checks (requires Schemathesis installed in the backend image):
 
 ```bash
-docker compose run --rm backend schemathesis run http://backend:8000/openapi.json
+docker compose -f docker-compose.yml run --rm backend schemathesis run http://backend:8000/openapi.json
 ```

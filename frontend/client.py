@@ -27,9 +27,7 @@ def login_user(username: str, password: str) -> dict:
 
 
 def list_appointments(token: str):
-    response = httpx.get(
-        f"{API_BASE_URL}/appointments/", headers=_auth_headers(token)
-    )
+    response = httpx.get(f"{API_BASE_URL}/appointments/", headers=_auth_headers(token))
     response.raise_for_status()
     return response.json()
 
@@ -70,17 +68,13 @@ def export_appointments_csv(token: str) -> str:
 
 
 def request_summary(token: str) -> dict:
-    response = httpx.post(
-        f"{API_BASE_URL}/summary/", headers=_auth_headers(token)
-    )
+    response = httpx.post(f"{API_BASE_URL}/summary/", headers=_auth_headers(token))
     response.raise_for_status()
     return response.json()
 
 
 def fetch_summary_result(token: str) -> dict:
-    response = httpx.get(
-        f"{API_BASE_URL}/summary/result", headers=_auth_headers(token)
-    )
+    response = httpx.get(f"{API_BASE_URL}/summary/result", headers=_auth_headers(token))
     response.raise_for_status()
     return response.json()
 

@@ -16,6 +16,7 @@ app.include_router(router)
 app.include_router(auth_router)
 app.include_router(summary_router)
 
+
 # Root endpoint
 @app.get("/")
 def root():

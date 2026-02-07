@@ -12,9 +12,7 @@ from backend.app.core.deps import get_current_user
 from backend.app.database import get_session
 from backend.app.repository_sqlite import SQLiteAppointmentRepository
 
-router = APIRouter(
-    prefix="/appointments", dependencies=[Depends(get_current_user)]
-)
+router = APIRouter(prefix="/appointments", dependencies=[Depends(get_current_user)])
 
 
 def get_repo(session=Depends(get_session)):
@@ -47,9 +45,7 @@ def export_appointments(repo=Depends(get_repo)):
     return Response(
         content=output.getvalue(),
         media_type="text/csv",
-        headers={
-            "Content-Disposition": "attachment; filename=appointments.csv"
-        },
+        headers={"Content-Disposition": "attachment; filename=appointments.csv"},
     )
 
 

@@ -53,9 +53,7 @@ with auth_tab_register:
 
     if register_submit:
         try:
-            token = register_user(register_username, register_password)[
-                "access_token"
-            ]
+            token = register_user(register_username, register_password)["access_token"]
             st.session_state["auth_token"] = token
             st.success("Registration successful.")
             st.rerun()

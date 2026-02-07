@@ -1,6 +1,11 @@
 fastapi==0.112.0
 uvicorn==0.30.1
 sqlmodel==0.0.22
+python-dotenv==1.0.1
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-jose[cryptography]==3.4.0
+python-multipart==0.0.20
 redis>=5.0
 pydantic-ai-slim[google]==0.3.0
 google-generativeai==0.7.0

@@ -56,6 +56,8 @@ appointments-api/
 | Method | Path                     | Description                                 |
 |--------|---------------------------|---------------------------------------------|
 | **GET**    | `/`                       | Root endpoint – service health message       |
+| **POST**   | `/auth/register`          | Register a new user and return JWT           |
+| **POST**   | `/auth/token`             | Login and return JWT                         |
 | **POST**   | `/appointments/`          | Create a new appointment                     |
 | **GET**    | `/appointments/`          | List all appointments                        |
 | **GET**    | `/appointments/{id}`      | Retrieve appointment by ID                   |
@@ -74,6 +76,12 @@ docker compose build
 ### 2️⃣ Run backend + frontend
 ```bash
 docker compose up
+```
+
+The backend requires a JWT secret. You can supply it via an .env file or inline:
+
+```bash
+JWT_SECRET_KEY="change-me" docker compose up
 ```
 
 ### 3️⃣ Access the system
@@ -143,6 +151,7 @@ docker run -p 8501:8501 -e API_BASE_URL="http://127.0.0.1:8000" appointments-api
 # 📝 Notes
 
 - Backend uses **SQLite + SQLModel** (persistent storage)
+- Auth uses JWT; protected endpoints require `Authorization: Bearer <token>`
 - Frontend communicates via **httpx**
 - Docker Compose links backend + frontend on an internal network (`backend:8000`)
 - SQLite DB file (`data/appointments.db`) is **excluded from Git**

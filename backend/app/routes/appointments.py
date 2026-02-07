@@ -5,10 +5,13 @@ Backed by the SQLite repository.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app.models import AppointmentCreate, AppointmentRead, AppointmentUpdate
+from backend.app.core.deps import get_current_user
 from backend.app.database import get_session
 from backend.app.repository_sqlite import SQLiteAppointmentRepository
 
-router = APIRouter(prefix="/appointments")
+router = APIRouter(
+    prefix="/appointments", dependencies=[Depends(get_current_user)]
+)
 
 
 def get_repo(session=Depends(get_session)):

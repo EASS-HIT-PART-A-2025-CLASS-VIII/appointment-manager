@@ -4,6 +4,7 @@ database storage, and API responses.
 """
 
 from typing import Optional
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field
 
 
@@ -52,3 +53,30 @@ class AppointmentUpdate(SQLModel):
     date: Optional[str] = None
     time: Optional[str] = None
     notes: Optional[str] = None
+
+
+class User(SQLModel, table=True):
+    """
+    Database model for application users.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    username: str = Field(index=True, unique=True)
+    hashed_password: str
+    role: str = "user"
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+
+class UserRead(BaseModel):
+    id: int
+    username: str
+    role: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

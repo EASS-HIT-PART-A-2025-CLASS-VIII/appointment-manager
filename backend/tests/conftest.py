@@ -1,7 +1,11 @@
 import os
+
+os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key")
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import SQLModel, create_engine, Session
+
 from backend.app.main import app
 from backend.app.database import get_session
 
@@ -45,3 +49,20 @@ def override_session(session):
 @pytest.fixture
 def client():
     return TestClient(app)
+
+
+@pytest.fixture
+def auth_headers(client):
+    response = client.post(
+        "/auth/register",
+        json={"username": "testuser", "password": "testpass"},
+    )
+    if response.status_code == 400:
+        response = client.post(
+            "/auth/token",
+            data={"username": "testuser", "password": "testpass"},
+        )
+
+    assert response.status_code == 200
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}

@@ -12,6 +12,7 @@ services:
       - ./data:/app/data
     environment:
       - PYTHONUNBUFFERED=1
+      - REDIS_URL=redis://redis:6379
 
   frontend:
     build:
@@ -23,4 +24,25 @@ services:
     environment:
       - API_BASE_URL=http://backend:8000
     depends_on:
+      - backend
+
+  redis:
+    image: redis:7
+    container_name: appointment-redis
+    ports:
+      - "6379:6379"
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: appointment-worker
+    command: ["python", "-m", "backend.app.workers.summary_worker"]
+    environment:
+      - PYTHONUNBUFFERED=1
+      - REDIS_URL=redis://redis:6379
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_MODEL=${GOOGLE_MODEL}
+    depends_on:
+      - redis
       - backend

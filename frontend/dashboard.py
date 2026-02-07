@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import httpx
+import time
+
 
 from client import (
     list_appointments,
@@ -8,6 +11,19 @@ from client import (
     delete_appointment,
     count_appointments_today,
 )
+
+API_BASE_URL = "http://backend:8000"
+
+def request_summary():
+    r = httpx.post(f"{API_BASE_URL}/summary/")
+    r.raise_for_status()
+    return r.json()
+
+def fetch_summary_result():
+    r = httpx.get(f"{API_BASE_URL}/summary/result")
+    r.raise_for_status()
+    return r.json()
+
 
 st.set_page_config(page_title="Appointment Manager", layout="wide")
 st.title("📅 Appointment Dashboard")
@@ -89,5 +105,33 @@ if total_count > 0:
             load_data.clear()
             st.success("Appointment deleted.")
             st.rerun()
+        except Exception as e:
+            st.error(f"Error: {e}")
+
+
+# -----------------------------
+# Section 5: AI Summary Generator
+# -----------------------------
+st.subheader("AI Summary Generator")
+
+colA, colB = st.columns(2)
+
+with colA:
+    if st.button("Generate AI Summary"):
+        try:
+            resp = request_summary()
+            st.success(f"Summary job queued! ({resp['count']} appointments)")
+        except Exception as e:
+            st.error(f"Error: {e}")
+
+with colB:
+    if st.button("Fetch Summary Result"):
+        try:
+            result = fetch_summary_result()
+            if result["status"] == "pending":
+                st.warning("Summary not ready yet, try again in a few seconds.")
+            else:
+                st.success("Summary Ready:")
+                st.write(result["summary"])
         except Exception as e:
             st.error(f"Error: {e}")

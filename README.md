@@ -1,9 +1,10 @@
-# Appointment Manager – Full System (Backend + Frontend + Docker Compose)
+# Appointment Manager – Full System (Backend + Frontend + Redis Worker + JWT + Docker Compose)
 
-A complete appointment-management system built across two project stages:
+A complete appointment-management system built across three project stages:
 
 - **EX1:** FastAPI backend (CRUD API + tests + Docker)
 - **EX2:** Streamlit dashboard frontend + Docker + Docker Compose
+- **EX3:** Redis-backed AI worker, JWT auth, and CSV export
 
 The system includes:
 
@@ -157,7 +158,7 @@ Tests cover:
 Example expected output:
 
 ```
-5 passed in X.XXs
+21 passed in X.XXs
 ```
 
 ---

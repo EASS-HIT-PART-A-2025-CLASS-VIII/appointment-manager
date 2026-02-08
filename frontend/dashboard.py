@@ -1,45 +1,82 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import httpx
-import time
-
 
 from client import (
     list_appointments,
     create_appointment,
     delete_appointment,
+    export_appointments_csv,
     count_appointments_today,
+    register_user,
+    login_user,
+    request_summary,
+    fetch_summary_result,
 )
-
-API_BASE_URL = "http://backend:8000"
-
-def request_summary():
-    r = httpx.post(f"{API_BASE_URL}/summary/")
-    r.raise_for_status()
-    return r.json()
-
-def fetch_summary_result():
-    r = httpx.get(f"{API_BASE_URL}/summary/result")
-    r.raise_for_status()
-    return r.json()
 
 
 st.set_page_config(page_title="Appointment Manager", layout="wide")
 st.title("📅 Appointment Dashboard")
 st.caption("FastAPI backend + Streamlit interface")
 
+if "auth_token" not in st.session_state:
+    st.session_state["auth_token"] = None
+
+st.subheader("Authentication")
+
+auth_tab_login, auth_tab_register = st.tabs(["Login", "Register"])
+
+with auth_tab_login:
+    with st.form("login_form"):
+        login_username = st.text_input("Username", key="login_username")
+        login_password = st.text_input(
+            "Password", type="password", key="login_password"
+        )
+        login_submit = st.form_submit_button("Login")
+
+    if login_submit:
+        try:
+            token = login_user(login_username, login_password)["access_token"]
+            st.session_state["auth_token"] = token
+            st.success("Logged in successfully.")
+            st.rerun()
+        except Exception as exc:
+            st.error(f"Login failed: {exc}")
+
+with auth_tab_register:
+    with st.form("register_form"):
+        register_username = st.text_input("Username", key="register_username")
+        register_password = st.text_input(
+            "Password", type="password", key="register_password"
+        )
+        register_submit = st.form_submit_button("Register")
+
+    if register_submit:
+        try:
+            token = register_user(register_username, register_password)["access_token"]
+            st.session_state["auth_token"] = token
+            st.success("Registration successful.")
+            st.rerun()
+        except Exception as exc:
+            st.error(f"Registration failed: {exc}")
+
+if not st.session_state.get("auth_token"):
+    st.info("Please login or register to continue.")
+    st.stop()
+
+auth_token = st.session_state["auth_token"]
+
 
 # Load appointments with caching
 @st.cache_data(ttl=10)
-def load_data():
-    return list_appointments()
+def load_data(token: str):
+    return list_appointments(token)
 
 
 # -----------------------------
 # Section 1: Metrics
 # -----------------------------
-appointments = load_data()
+appointments = load_data(auth_token)
 
 total_count = len(appointments)
 today_count = count_appointments_today(appointments)
@@ -59,6 +96,17 @@ if total_count == 0:
 else:
     df = pd.DataFrame(appointments)
     st.dataframe(df, use_container_width=True)
+
+    try:
+        csv_data = export_appointments_csv(auth_token)
+        st.download_button(
+            label="Download CSV",
+            data=csv_data,
+            file_name="appointments.csv",
+            mime="text/csv",
+        )
+    except Exception as exc:
+        st.error(f"CSV export failed: {exc}")
 
 
 # Refresh button
@@ -82,7 +130,7 @@ with st.form("create_form"):
 
 if submitted:
     try:
-        create_appointment(client_name, date_str, time_str, notes)
+        create_appointment(auth_token, client_name, date_str, time_str, notes)
         load_data.clear()
         st.success("Appointment created successfully!")
         st.rerun()
@@ -101,7 +149,7 @@ if total_count > 0:
 
     if st.button("Delete Selected"):
         try:
-            delete_appointment(int(selected))
+            delete_appointment(auth_token, int(selected))
             load_data.clear()
             st.success("Appointment deleted.")
             st.rerun()
@@ -119,7 +167,7 @@ colA, colB = st.columns(2)
 with colA:
     if st.button("Generate AI Summary"):
         try:
-            resp = request_summary()
+            resp = request_summary(auth_token)
             st.success(f"Summary job queued! ({resp['count']} appointments)")
         except Exception as e:
             st.error(f"Error: {e}")
@@ -127,7 +175,7 @@ with colA:
 with colB:
     if st.button("Fetch Summary Result"):
         try:
-            result = fetch_summary_result()
+            result = fetch_summary_result(auth_token)
             if result["status"] == "pending":
                 st.warning("Summary not ready yet, try again in a few seconds.")
             else:

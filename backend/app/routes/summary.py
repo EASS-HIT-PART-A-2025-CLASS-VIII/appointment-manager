@@ -2,9 +2,10 @@ import json
 import redis
 from fastapi import APIRouter, Depends
 
+from backend.app.core.deps import get_current_user
 from backend.app.routes.appointments import get_repo
 
-router = APIRouter(prefix="/summary")
+router = APIRouter(prefix="/summary", dependencies=[Depends(get_current_user)])
 
 redis_client = redis.Redis(host="redis", port=6379, decode_responses=True)
 

@@ -6,13 +6,16 @@ Includes routers and defines the root endpoint.
 from fastapi import FastAPI
 from backend.app.database import init_db
 from backend.app.routes.appointments import router
+from backend.app.routes.auth import router as auth_router
 from backend.app.routes.summary import router as summary_router
 
 app = FastAPI(title="Appointment Manager")
 
 # Attach routers
 app.include_router(router)
+app.include_router(auth_router)
 app.include_router(summary_router)
+
 
 # Root endpoint
 @app.get("/")

@@ -23,6 +23,18 @@ async def generate_summary(appointments: list[dict]) -> str:
     return str(result.data)
 
 
+async def process_job(client, raw) -> int:
+    if isinstance(raw, bytes):
+        raw = raw.decode()
+
+    data = json.loads(raw)
+    appointments = data.get("appointments", [])
+
+    summary = await generate_summary(appointments)
+    await client.set(SUMMARY_RESULT_KEY, summary)
+    return len(appointments)
+
+
 async def worker_loop():
     client = await redis.from_url(REDIS_URL)
     print("Worker started. Waiting for jobs...")
@@ -30,17 +42,13 @@ async def worker_loop():
     while True:
         try:
             job = await client.blpop(QUEUE, timeout=5)
-            
+
             if job is None:
                 continue
-                
-            _, raw = job
-            data = json.loads(raw)
-            appointments = data.get("appointments", [])
 
-            summary = await generate_summary(appointments)
-            await client.set(SUMMARY_RESULT_KEY, summary)
-            print(f"Summary generated for {len(appointments)} appointments")
+            _, raw = job
+            count = await process_job(client, raw)
+            print(f"Summary generated for {count} appointments")
 
         except Exception as e:
             print(f"Error processing job: {e}")

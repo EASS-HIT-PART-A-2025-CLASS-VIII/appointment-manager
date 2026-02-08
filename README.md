@@ -38,16 +38,16 @@ appointments-api/
 │   │       ├── auth.py
 │   │       └── summary.py
 │   │
-│   │   ├── scripts/
-│   │   │   ├── refresh.py
-│   │   │   └── demo.sh
+│   ├── scripts/
+│   │   ├── refresh.py
+│   │   └── demo.sh
 │   │
 │   ├── tests/
 │   │   ├── conftest.py
 │   │   ├── test_appointments.py
-│   │   └── test_auth.py
+│   │   ├── test_auth.py
 │   │   ├── test_summary.py
-│   │   └── test_summary_worker.py
+│   │   ├── test_summary_worker.py
 │   │   └── test_refresh.py
 │   │
 │   └── Dockerfile
@@ -79,6 +79,7 @@ appointments-api/
 | **GET**    | `/`                       | Root endpoint – service health message       |
 | **POST**   | `/auth/register`          | Register a new user and return JWT           |
 | **POST**   | `/auth/token`             | Login and return JWT                         |
+| **GET**    | `/auth/admin/ping`        | Admin-only role check endpoint               |
 | **POST**   | `/summary/`               | Queue AI summary job (auth required)         |
 | **GET**    | `/summary/result`         | Fetch latest summary (auth required)         |
 | **POST**   | `/appointments/`          | Create a new appointment                     |

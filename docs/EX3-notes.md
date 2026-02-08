@@ -70,4 +70,4 @@ Run the demo script:
 ./backend/scripts/demo.sh
 ```
 
-It starts the stack, registers a user, creates an appointment, downloads CSV, and queues a summary job.
+It starts the full stack, registers or logs in a user, creates an appointment, lists and updates it, exports a CSV and prints its contents, queues an AI summary job, waits for the worker to process it, fetches the generated summary, and finally deletes the appointment.
